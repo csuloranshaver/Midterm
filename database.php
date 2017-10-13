@@ -1,8 +1,8 @@
 <?php
     $servername = 'localhost';
-    $username = 'mgs_user';
+    $username = 'ts_user';
     $password = 'pa55word';
-    $dbname = 'shopDB';
+    $dbname = 'tech_support';
 
     $db = new mysqli($servername, $username, $password, $dbname);
 

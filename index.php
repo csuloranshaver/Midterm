@@ -1,12 +1,20 @@
 <?php
     require_once('database.php');
-
-    // Get products for selected category
-    $query = "SELECT * FROM customers
-              ORDER BY customerID";
-    $customers = $db->query($query);
     
-    $db->close();
+    $customerID = 1004;
+    
+    $query = "SELECT products.productCode, products.name, customers.firstName, customers.lastName
+                FROM registrations
+                JOIN products ON registrations.productCode = products.productCode
+                JOIN customers ON registrations.customerID = customers.customerID
+                WHERE registrations.customerID = ?";
+              
+    $stmt = $db->prepare($query);
+    $stmt->bind_param('s', $customerID);
+    $stmt->execute();
+    
+    $stmt->store_result();
+    $stmt->bind_result($productCode, $name, $firstName, $lastName);
 ?>
 <!DOCTYPE html>
 <html>
@@ -22,26 +30,30 @@
     <div id="page">
 
     <div id="header">
-        <h1>Customer Manager</h1>
+        <h1>Registration Manager</h1>
     </div>
 
     <div id="main">
 
-        <h1>Customer List</h1>
+        <h1>Registrations</h1>
 
         <div id="content">
             <!-- display a table of customers -->
             <table>
                 <tr>
+                    <th>Product Code</th>
+                    <th>Product Name</th>
                     <th>First Name</th>
                     <th>Last Name</th>
                 </tr>
-                <?php foreach ($customers as $customer) : ?>
+                <?php while ($stmt->fetch()) : ?>
                 <tr>
-                    <td><?php echo $customer['firstName']; ?></td>
-                    <td><?php echo $customer['lastName']; ?></td>
+                    <td><?php echo $productCode; ?></td>
+                    <td><?php echo $name; ?></td>
+                    <td><?php echo $firstName; ?></td>
+                    <td><?php echo $lastName; ?></td>
                 </tr>
-                <?php endforeach; ?>
+                <?php endwhile; ?>
             </table>
         </div>
     </div>
@@ -53,3 +65,7 @@
     </div><!-- end page -->
 </body>
 </html>
+<?php
+    $stmt -> free_result();
+    $db -> close();
+?>
